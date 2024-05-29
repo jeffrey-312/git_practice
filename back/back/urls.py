@@ -19,4 +19,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('connect_db.urls')),
+    # path('', include('practice.urls')),
 ]

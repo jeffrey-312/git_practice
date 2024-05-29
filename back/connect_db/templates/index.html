@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flask App</title>
+    <title id="pageTitle">Flask App</title>
 </head>
 
 <body>
@@ -43,6 +43,38 @@
                 }
             }
             document.getElementById("selectedText").value = JSON.stringify(selectedText);
+        }
+
+        // Get the username from the JWT
+        function getUsernameFromJWT() {
+            var token = getCookie('jwt'); 
+            if (token) {
+                var payload = JSON.parse(atob(token.split('.')[1])); // Decode the middle part of the token
+                return payload.username;
+            }
+            return 'null';
+        }
+        
+        // Function to get cookie value by name
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Update the title with the username from the JWT
+        var username = getUsernameFromJWT();
+        if (username) {
+            document.getElementById('pageTitle').innerText = "User = " + username;
         }
     </script>
 
