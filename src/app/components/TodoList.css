@@ -1,0 +1,59 @@
+/* src/components/TodoList.css */
+.todo-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+.todo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.todo-date {
+    margin-left: 20px;
+    color: #888;
+}
+.todo-text {
+    flex: 1;
+}
+
+.todo-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.todo-actions button {
+    padding: 5px 10px;
+}
+userInputContainer {
+    width: 100%;
+    display: flex;
+    border-bottom: 1px #aeacac solid;
+    padding-bottom: 20px;
+}
+
+input {
+    padding: 10px;
+    margin-right: 10px;
+}
+
+
+button {
+    padding: 5px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin: 10px 0;
+}
+
+span {
+    cursor: pointer;
+}

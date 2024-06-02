@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+  
+main {
+    width: 1000px;
+    height: 1000px;
+    margin: 0px auto;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #ffffff;
+    box-shadow: 2px 2px 5px #a79d9d;
+}
+
+userInputContainer {
+    width: 100%;
+    display: flex;
+    border-bottom: 1px #aeacac solid;
+    padding-bottom: 20px;
+}
+
+input {
+    padding: 10px;
+    margin-right: 10px;
+}
+
+
+button {
+    padding: 5px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin: 10px 0;
+}
+
+span {
+    cursor: pointer;
+}
+
+.App {
+    text-align: center;
+}
+  
+.App-header {
+    padding: 20px;
+    font-size: 2em;
+}
