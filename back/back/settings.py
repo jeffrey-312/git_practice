@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'connect_db.apps.ConnectDbConfig',
-    'practice.apps.PracticeConfig',
+    
 ]
 
 MIDDLEWARE = [
@@ -82,8 +82,8 @@ DATABASES = {
         'NAME': 'tasks',
         'USER': 'root',                       
         'PASSWORD': '',            
-        'HOST': '',                           
-        'PORT': '',
+        'HOST': '35.189.180.59',                           
+        'PORT': '33306',
     }
 }
 
