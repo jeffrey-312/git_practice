@@ -31,6 +31,8 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+
+    'django_crontab',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'connect_db.apps.ConnectDbConfig',
+    
     
 ]
 
@@ -134,3 +137,8 @@ EMAIL_PORT = 587                    # TLS通訊埠號
 EMAIL_USE_TLS = True        # 開啟TLS(傳輸層安全性)
 EMAIL_HOST_USER = 'b10902235@gapps.ntust.edu.tw'  # 寄件者電子郵件
 EMAIL_HOST_PASSWORD = 'me262bf109'  # Gmail應用程式的密碼
+
+
+CRONJOBS = [
+    ('*/1 * * * *', 'connect_db.update.check_task_deadlines')
+]

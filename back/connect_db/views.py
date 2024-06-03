@@ -74,7 +74,7 @@ def get_today_tasks(user_id):
             #if smalltask.end_time.date() == today:
             data = {
                 "name": smalltask.task_name,
-                "state": smalltask.state,
+                "state": num2state[smalltask.state],
                 "end": smalltask.end_time.strftime('%Y-%m-%d %H:%M'),
                 "description": smalltask.description
             }
@@ -258,7 +258,7 @@ def add_small_task(request):
             return JsonResponse(data)
 
 
-def get_todolist(request):
+def get_todolist(request): 
     data = json.load(request)
     user_id = data['user_id']
     maintask, subtask = get_main_sub_tasks(user_id)
