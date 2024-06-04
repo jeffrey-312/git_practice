@@ -32,7 +32,9 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
 
-    'django_crontab',
+    'django_crontab',     # crontab 背景執行用
+    'corsheaders',        # cors 解決跨域問題
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -46,6 +48,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',            # cors用
+    'django.middleware.common.CommonMiddleware',        # cors用
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -79,7 +84,7 @@ WSGI_APPLICATION = 'back.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = {
+DATABASES = {                                    # 連接db 
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'tasks',
@@ -138,7 +143,19 @@ EMAIL_USE_TLS = True        # 開啟TLS(傳輸層安全性)
 EMAIL_HOST_USER = 'b10902235@gapps.ntust.edu.tw'  # 寄件者電子郵件
 EMAIL_HOST_PASSWORD = 'me262bf109'  # Gmail應用程式的密碼
 
-
+# 新增cronjob每分鐘背景執行更新資料庫
 CRONJOBS = [
     ('*/1 * * * *', 'connect_db.update.check_task_deadlines')
 ]
+
+CORS_ORIGIN_ALLOW_ALL=True    # 允許所有跨域連線
+
+'''
+上面那行指令允許所有，下面這個為設立白名單
+CORS_ORIGIN_WHITELIST = [
+    'http://google.com',
+    'http://hostname.example.com',
+    'http://localhost:8000',
+    'http://127.0.0.1:9000'
+]
+'''
