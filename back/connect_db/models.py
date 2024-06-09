@@ -9,6 +9,7 @@ class UserInfo(models.Model):
     username = models.CharField(max_length=30, unique=False)
     useremail = models.EmailField(max_length=100, unique=True)
     password = models.CharField(max_length=256)
+    line_id = models.CharField(max_length=33, unique=True, null=True)
 
     def __str__(self):
         return self.username

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'connect_db.apps.ConnectDbConfig',
+    'connect_line.apps.ConnectLineConfig'
     
     
 ]

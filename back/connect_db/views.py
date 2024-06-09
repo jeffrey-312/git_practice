@@ -15,6 +15,7 @@ from .models import UserInfo, Dailytask, Subtask, Maintask
 from django.shortcuts import get_object_or_404
 import random, string
 from django.core.mail import send_mail, BadHeaderError
+import re
 # Create your views here.
 
 state2num = { 'processing' : 0, 'complete' : 1, 'fail' : 2, 'delete' : 3 } 
@@ -32,7 +33,7 @@ def get_main_sub_tasks(user_id):
         maintask_data = {
             "name": maintask.maintask_name,
             "state": num2state[maintask.state],
-            "start": maintask.start_time,
+            "start": maintask.start_time.strftime('%Y-%m-%d %H:%M'),
             "end": maintask.end_time.strftime('%Y-%m-%d %H:%M'),
             "description": maintask.description,
             "subtasks": []
@@ -45,6 +46,7 @@ def get_main_sub_tasks(user_id):
             subtask_data = {
                 "name": subtask.task_name,
                 "state": num2state[subtask.state],
+                "belong" : maintask.maintask_name,
                 "end": subtask.end_time.strftime('%Y-%m-%d %H:%M'),
                 "description": subtask.description
             }
@@ -158,14 +160,16 @@ def add_maintask(request):
     end = data['end']
     state = state2num[data["state"]]
     description = data["description"]
-    start = datetime.strptime(start, "%Y/%m/%d %H:%M")
-    end = datetime.strptime(end, "%Y/%m/%d %H:%M")
+    start = datetime.strptime(start, "%Y-%m-%d %H:%M")
+    end = datetime.strptime(end, "%Y-%m-%d %H:%M")
+    # start = start
+    # end = end
     print(data)
     print(user_id)
     print(start)
     print(end)
-    print(state)
-    print(description)
+    # print(state)
+    # print(description)
     try:
         Maintask.objects.create(
             user_id = user_id ,
@@ -181,24 +185,14 @@ def add_maintask(request):
         data = {"msg": "Maintask name already exists"}
         return JsonResponse(data)
     except Exception as e:
-        data = {"msg" : "error", "error_reason": str(e)}
+        data = {"msg" : "error"+"error_reason : "+ str(e)}
+        print(str(e))
         return JsonResponse(data)
 
 
 def add_small_task(request):
     
-    '''
-    輸入:
 
-    "user_id" : "3" ,
-	"name" : "subtask name" ,
-	"end" : "YYYY/MM/DD/HH/mm" , 
-	"state" : "processing", 
-	"belong" : "maintask1",
-	"description" : "任務描述" 
-
-
-    '''
     data = json.load(request)
     user_id = data['user_id']
     name = data['name']
@@ -206,14 +200,10 @@ def add_small_task(request):
     state = state2num[data["state"]]
     belong = data["belong"]
     description = data["description"]
-    end = datetime.strptime(end, "%Y/%m/%d %H:%M")
-    print(data)
-    print(user_id)
-    print(end)
-    print(state)
-    print(description)
+    end = datetime.strptime(end, "%Y-%m-%d %H:%M")
+    
     if belong == "none":
-        if Dailytask.objects.filter(task_name=name, end_time=end).exists():
+        if Dailytask.objects.filter(task_name=name, end_time=end, user = user_id).exists():
             data = {"msg": "this daily task already exist"}
             return JsonResponse(data)
         else:
@@ -227,10 +217,8 @@ def add_small_task(request):
                 )
                 data = {"msg": "dailytask add successful"}
                 return JsonResponse(data)
-            except:
-                data = {"msg" : "error"}
-                return JsonResponse(data)
-            
+            except Exception as e:
+                return JsonResponse({"msg": "error", "error_reason": str(e)})
     else: 
         maintask = Maintask.objects.filter(user_id=user_id, maintask_name=belong).first() 
         if maintask:
@@ -253,9 +241,8 @@ def add_small_task(request):
             )
             data = {"msg": "subtask add successful"}
             return JsonResponse(data)
-        except:
-            data = {"msg" : "error"}
-            return JsonResponse(data)
+        except Exception as e:
+            return JsonResponse({"msg": "error", "error_reason": str(e)})
 
 
 def get_todolist(request): 
@@ -301,8 +288,8 @@ def change_small_state(request):
     belong = data['belong']
     state = state2num[data["state"]]
     end = data['end']
-    end = datetime.strptime(end, "%Y/%m/%d %H:%M")
-    print(end)
+    end = datetime.strptime(end, "%Y-%m-%d %H:%M")
+    print(data)
     if belong == 'none':
         try: 
             task = get_object_or_404(Dailytask, task_name=name,user_id = user_id,end_time = end)
@@ -350,39 +337,64 @@ def send_key(email):
         return result
 
 
+def vaild_email(email) :
+    pat = '^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$'
+    if re.search(pat, email) :
+        return True
+    else :
+        return False
+    
+
 def sign_up(request):
     data = json.load(request)
     email = data['email']
+    print(vaild_email(email))
     if UserInfo.objects.filter(useremail=email).exists():
-        return JsonResponse({"msg": "this email already exist"})
+        return JsonResponse({"msg": "this email already exist", "key" : "none"})
     else:
-        result = send_key(email)
-        return JsonResponse(result)
+        if vaild_email(email) :
+            result = send_key(email)
+            return JsonResponse(result)
+        else :
+            return JsonResponse({"msg": "invaild email", "key" : "none"})
     
 
 def forget_send(request):
     data = json.load(request)
     email = data['email']
+    if not vaild_email(email) :
+        return JsonResponse({"msg": "email error", "key" : "none"})
     if UserInfo.objects.filter(useremail=email).exists():
         result = send_key(email)
         return JsonResponse(result)
     else:
-        return JsonResponse({"msg": "this email has not registered yet"})
+        return JsonResponse({"msg": "this email has not registered yet", "key" : "none"})
     
 
 def change_password(request):
     data = json.load(request)
     user_id = data['user_id']
+    email = data['email']
     new_password = data['new_password']
-    try:
-        user = get_object_or_404(UserInfo, user_id = user_id)
-        # 更新 state 属性
-        user.password = new_password
-        user.save()
-        return JsonResponse({"msg": "success"})
-    except Exception as e:
-        return JsonResponse({"msg": "error", "error_reason": str(e)})
-    
+    if email == 'none' :
+        try:
+            user = get_object_or_404(UserInfo, user_id = user_id)
+            
+            user.password = new_password
+            user.save()
+            return JsonResponse({"msg": "success"})
+        except Exception as e:
+            return JsonResponse({"msg": "error", "error_reason": str(e)})
+    else :
+        try:
+            user = get_object_or_404(UserInfo, useremail = email)
+            
+            user.password = new_password
+            user.save()
+            return JsonResponse({"msg": "success"})
+        except Exception as e:
+            return JsonResponse({"msg": "error", "error_reason": str(e)})
+
 
 def search_dailytasks(user_id, date, keyword):
     try:
@@ -405,7 +417,7 @@ def search_dailytasks(user_id, date, keyword):
             #if smalltask.end_time.date() == today:
             data = {
                 "name": smalltask.task_name,
-                "state": smalltask.state,
+                "state": num2state[smalltask.state],
                 "end": smalltask.end_time.strftime('%Y-%m-%d %H:%M'),
                 "description": smalltask.description
             }
@@ -438,6 +450,7 @@ def search_subtasks(user_id, date, keyword):
                     "name": subtask.task_name,
                     "state": num2state[subtask.state],
                     "end": subtask.end_time.strftime('%Y-%m-%d %H:%M'),
+                    "belong" : maintask.maintask_name,
                     "description": subtask.description
                 }
                 date_subtask.append(subtask_data)
@@ -452,10 +465,25 @@ def search_task(request):
     user_id = data['user_id']
     date = data['date']
     keyword = data['keyword']
+    print(data)
     daily_result = search_dailytasks(user_id, date, keyword)
     sub_result = search_subtasks(user_id, date, keyword)
+    # print(daily_result)
+    # print(sub_result)
     if daily_result != 'error' and sub_result != 'error':
         return JsonResponse({'msg' : 'success', 'dailytask' : daily_result, 'subtask' : sub_result})
     else:
         return JsonResponse({'msg' : 'error'})
         
+'''
+def verify_key(request):
+    data = json.load(request)
+    email = data['email']
+    key = data['key']
+    user = get_object_or_404(UserInfo, useremail = email)
+    correct_key = user.key
+    if key == correct_key :
+        return JsonResponse({"msg": "success"})
+    else :
+        return JsonResponse({"msg": "fail"})
+'''
