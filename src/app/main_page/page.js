@@ -123,7 +123,7 @@ export default function Maintask({ maintask }) {
         }));
     };
 
-    const handleAddTask = async (taskData) => {
+    const handleAddTask = async (taskData) => {//增加主任物
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/add_maintask/`, {
                 method: 'POST',
@@ -140,15 +140,21 @@ export default function Maintask({ maintask }) {
                 })
             });
             const data = await response.json();
-            if (data.msg === 'success') {
+            if (data.msg === 'success') {// 新增成功
                 window.location.reload();
+            }else if(data.msg === 'Maintask name already exists'){// 主任務已經存在
+                alert("新增主任務失敗，主任務已經存在！");
+            }else if(data.msg === 'invalid time'){//時間錯誤
+                alert("新增主任務失敗，時間無效！");
+            }else if(data.msg === 'error'){// 新增失敗
+                alert("新增主任務失敗，請再試一次！");
             }
         } catch (error) {
             console.error('Error adding task:', error);
         }
     };
 
-    const handleAddDailyTask = async (taskData) => {
+    const handleAddDailyTask = async (taskData) => {//增加小任務
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/add_small_task/`, {
                 method: 'POST',
@@ -165,8 +171,20 @@ export default function Maintask({ maintask }) {
                 })
             });
             const data = await response.json();
-            if (data.msg === 'dailytask add successful' || data.msg === 'subtask add successful') {
+            if (data.msg === 'dailytask add successful' || data.msg === 'subtask add successful') {// 新增小任務成功、新增子任務成功
                 window.location.reload();
+            }else if (data.msg === 'this daily task already exist') {// 小任務重複
+                alert("新增小任務失敗，小任務重複！");
+            }else if (data.msg === 'this subtask already exist') {// 子任務重複
+                alert("新增子任務失敗，子任務重複！");
+            }else if (data.msg === "maintask doesn't exist") {// 主任務不存在
+                alert("新增子任務失敗，主任務不存在！");
+            }else if (data.msg === 'invalid time') {// 時間錯誤
+                alert("新增任務失敗，時間無效！");
+            }else if (data.msg === 'the state of the maintask is not processing') {// 主任務已經完成或失敗
+                alert("新增子任務失敗，主任務已經完成或失敗！");
+            }else if (data.msg === 'error') {// 其餘錯誤
+                alert("新增任務失敗，請再試一次！");
             }
         } catch (error) {
             console.error('Error adding task:', error);
