@@ -36,6 +36,7 @@ export default function AddNewUser() {
                 const data = response.data;
                 if (data.msg === "success") {
                     console.log("註冊成功", data);
+                    alert("註冊成功！請重新登入！")
                     router.push(`/login`);
     
                 } else if (data.msg === "error") {

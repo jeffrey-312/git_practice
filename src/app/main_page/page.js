@@ -199,6 +199,7 @@ export default function Maintask({ maintask }) {
                     <button className='bg-gray-400 text-white rounded-md w-20' onClick={logOut}>登出</button>
                     <button className='bg-gray-400 text-white rounded-md w-20' onClick={changePassword}>更改密碼</button>
                 </div>
+                <div>----------------------</div>
                 <button className='bg-gray-400 text-white rounded-md w-1/2' onClick={() => setIsPopupOpen(true)}>Add Maintask</button>
                 <h1>Maintask</h1>
                 {tasks && tasks.map(task => (

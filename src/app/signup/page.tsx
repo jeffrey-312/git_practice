@@ -26,11 +26,12 @@ const Signup: React.FC = () =>{
             console.log(response);
             const data = response.data;
             if (data.msg === "success") {
-                console.log("驗證碼發送成功:", data);
+                // console.log("驗證碼發送成功:", data);
+                console.log("驗證碼發送成功");
+                alert("已經發送驗證碼至信箱");
                 setKey(data.key); // 儲存返回的 key
             } else if (data.msg === "invaild email") {
                 console.log("無效的 email:", data);
-                // setMessage("無效的 email");
                 setKey(""); // 清空 key
             } else if (data.msg === "this email already exist") {
                 console.log("該 email 已經註冊過了", data);
