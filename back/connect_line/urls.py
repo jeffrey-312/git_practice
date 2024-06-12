@@ -12,4 +12,7 @@ urlpatterns = [
     path('add_small_task/',views.add_small_task),
     path('change_small_state/',views.change_small_state),
     path('get_todolist/',views.get_todolist),
+    path('add_maintask/',views.add_maintask),
+    path('change_main_state/',views.change_main_state),
+    path('login/',views.login),
 ]

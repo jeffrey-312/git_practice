@@ -12,6 +12,21 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 
+import environ
+
+PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT, PROJECT_MODULE_NAME = os.path.split(PROJECT_PATH)
+
+env_file = '.env'
+env = environ.Env()
+env.read_env(env_file=os.path.join(PROJECT_ROOT, env_file))
+
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+db_host = env('db_host')
+db_port = env('db_port')
+line_ip = env('line_ip')
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -91,8 +106,8 @@ DATABASES = {                                    # 連接db
         'NAME': 'tasks',
         'USER': 'root',                       
         'PASSWORD': '',            
-        'HOST': '35.189.180.59',                           
-        'PORT': '33306',
+        'HOST': db_host,                           
+        'PORT': db_port,
     }
 }
 
@@ -141,8 +156,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'       # SMTP伺服器
 EMAIL_PORT = 587                    # TLS通訊埠號
 EMAIL_USE_TLS = True        # 開啟TLS(傳輸層安全性)
-EMAIL_HOST_USER = 'b10902235@gapps.ntust.edu.tw'  # 寄件者電子郵件
-EMAIL_HOST_PASSWORD = 'me262bf109'  # Gmail應用程式的密碼
+EMAIL_HOST_USER = EMAIL_HOST_USER  # 寄件者電子郵件
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD  # Gmail應用程式的密碼
 
 # 新增cronjob每分鐘背景執行更新資料庫
 CRONJOBS = [

@@ -16,11 +16,19 @@ from django.shortcuts import get_object_or_404
 import random, string
 from django.core.mail import send_mail, BadHeaderError
 import re
+import uuid
 # Create your views here.
 
 state2num = { 'processing' : 0, 'complete' : 1, 'fail' : 2, 'delete' : 3 } 
 num2state = { 0 : 'processing', 1 : 'complete', 2 : 'fail' } 
 
+
+def sort_tasks(tasks):
+    return sorted(tasks, key=lambda x: (
+        x["state"] != "processing",  # processing 在最前面
+        x["state"] != "complete",    # complete 在 processing 後面，fail 在最後面
+        datetime.strptime(x.get("end", ""), "%Y-%m-%d %H:%M") if x.get("end") else datetime.max  # 根據 end_time 排序，越早的排越前面
+    ))
 
 def get_main_sub_tasks(user_id):
     today = date.today()
@@ -55,9 +63,11 @@ def get_main_sub_tasks(user_id):
             # 查看子任務是否為今天的
             if subtask.end_time.date() == today:
                 today_subtask.append(subtask_data)
-
+        maintask_data["subtasks"] = sort_tasks(maintask_data["subtasks"])
         tasks_data.append(maintask_data)
     
+    today_subtask = sort_tasks(today_subtask)
+    tasks_data = sort_tasks(tasks_data)
     return tasks_data, today_subtask
 
 
@@ -81,11 +91,19 @@ def get_today_tasks(user_id):
                 "description": smalltask.description
             }
             result.append(data)
+        result = sort_tasks(result)
         return result
     except :
         response = {"msg": "error"}
         return JsonResponse(response)
 
+
+def vaild_time(start,end):
+    now = datetime.now()
+    if start == 'none':
+        return end > now
+    else :
+        return end > start and end > now
 
 
 def login(request):
@@ -170,6 +188,10 @@ def add_maintask(request):
     print(end)
     # print(state)
     # print(description)
+
+    if not vaild_time(start,end):
+        return JsonResponse({"msg":"invalid time"})
+    
     try:
         Maintask.objects.create(
             user_id = user_id ,
@@ -185,7 +207,7 @@ def add_maintask(request):
         data = {"msg": "Maintask name already exists"}
         return JsonResponse(data)
     except Exception as e:
-        data = {"msg" : "error"+"error_reason : "+ str(e)}
+        data = {"msg" : "error","error_reason" : str(e)}
         print(str(e))
         return JsonResponse(data)
 
@@ -203,6 +225,10 @@ def add_small_task(request):
     end = datetime.strptime(end, "%Y-%m-%d %H:%M")
     
     if belong == "none":
+        
+        if not vaild_time('none',end):
+            return JsonResponse({"msg":"invalid time"})
+        
         if Dailytask.objects.filter(task_name=name, end_time=end, user = user_id).exists():
             data = {"msg": "this daily task already exist"}
             return JsonResponse(data)
@@ -218,19 +244,29 @@ def add_small_task(request):
                 data = {"msg": "dailytask add successful"}
                 return JsonResponse(data)
             except Exception as e:
-                return JsonResponse({"msg": "error", "error_reason": str(e)})
+                return JsonResponse({"msg": "error", " error_reason": str(e)})
     else: 
         maintask = Maintask.objects.filter(user_id=user_id, maintask_name=belong).first() 
         if maintask:
             maintask_id = maintask.maintask_id
+            main_end = maintask.end_time
+            main_state = maintask.state
         else:
             data = {"msg" : "maintask doesn't exist"}
             return JsonResponse(data)
+
+    if main_state != 0 :
+        return JsonResponse({"msg" : "the state of the maintask is not processing"})
 
     if Subtask.objects.filter(task_name=name, end_time=end, maintask_id = maintask_id).exists():
         data = {"msg": "this subtask already exist"}
         return JsonResponse(data)  
     else:
+
+        now = datetime.now()
+        if main_end < end or end < now:
+            return JsonResponse({"msg":"invalid time"})
+
         try:
             Subtask.objects.create(
                 maintask_id = maintask_id ,
@@ -242,10 +278,11 @@ def add_small_task(request):
             data = {"msg": "subtask add successful"}
             return JsonResponse(data)
         except Exception as e:
-            return JsonResponse({"msg": "error", "error_reason": str(e)})
+            return JsonResponse({"msg": "error.", " error_reason": str(e)})
 
 
 def get_todolist(request): 
+    print(datetime.now())
     data = json.load(request)
     user_id = data['user_id']
     maintask, subtask = get_main_sub_tasks(user_id)
@@ -339,16 +376,16 @@ def send_key(email):
 
 def vaild_email(email) :
     pat = '^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$'
-    if re.search(pat, email) :
+    if re.search(pat, email):
         return True
-    else :
+    else:
         return False
     
 
 def sign_up(request):
     data = json.load(request)
     email = data['email']
-    print(vaild_email(email))
+    
     if UserInfo.objects.filter(useremail=email).exists():
         return JsonResponse({"msg": "this email already exist", "key" : "none"})
     else:
@@ -486,4 +523,20 @@ def verify_key(request):
         return JsonResponse({"msg": "success"})
     else :
         return JsonResponse({"msg": "fail"})
+'''
+'''
+def sign_up_sess(request):
+    data = json.load(request)
+    email = data['email']
+
+    if UserInfo.objects.filter(useremail=email).exists():
+        return JsonResponse({"msg": "this email already exist", "key" : "none"})
+    
+    if vaild_email(email) :
+        result = send_key(email)
+        if result['msg'] == 'success':
+            session_id = str(uuid.uuid4())
+            return JsonResponse(result)
+    else :
+        return JsonResponse({"msg": "invaild email", "key" : "none"})
 '''

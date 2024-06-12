@@ -9,6 +9,8 @@ mysqlclient = "*"
 pyjwt = "*"
 django-crontab = "*"
 django-cors-headers = "*"
+requests = "*"
+django-environ = "*"
 
 [dev-packages]
 
