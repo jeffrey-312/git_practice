@@ -26,7 +26,7 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 db_host = env('db_host')
 db_port = env('db_port')
 line_ip = env('line_ip')
-
+db_password = env('db_password')
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -105,7 +105,7 @@ DATABASES = {                                    # 連接db
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'tasks',
         'USER': 'root',                       
-        'PASSWORD': '',            
+        'PASSWORD': db_password,            
         'HOST': db_host,                           
         'PORT': db_port,
     }
