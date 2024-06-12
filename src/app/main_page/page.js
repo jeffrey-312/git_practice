@@ -7,6 +7,7 @@ import Dailytasks from '@/components_main/Dailytasks';
 import Subtasks from '@/components_main/Subtasks';
 import SearchResults from '@/components_main/SearchResult';
 import { useRouter } from 'next/navigation'; // 从 next/navigation 引入 useRouter
+import moment from 'moment';
 
 export default function Maintask({ maintask }) {
     const [tasks, setTasks] = useState(maintask || []);
@@ -191,6 +192,20 @@ export default function Maintask({ maintask }) {
         }
     };
 
+    const getTaskStyle = (endTime) => {//返回不同的樣式
+        const now = moment();
+        const end = moment(endTime);
+        const diff = end.diff(now, 'minutes');//計算兩個時間點之間的差異
+
+        if (diff <= 60) {
+            return { color: 'red' };
+        } else if (diff <= 180) {
+            return { color: 'orange' };
+        } else {
+            return {};
+        }
+    };
+
     return (
         <div className="container bg-slate-200">
             <div className="maintask ">
@@ -204,14 +219,18 @@ export default function Maintask({ maintask }) {
                 <h1>Maintask</h1>
                 {tasks && tasks.map(task => (
                     task && task.name && (
-                        <Task
+                        <div
                             key={task.name}
-                            task={task}
-                            expandedTasks={expandedTasks}
-                            toggleTask={toggleTask}
-                            expandedSubtasks={expandedSubtasks}
-                            toggleSubtask={toggleSubtask}
-                        />
+                            style={getTaskStyle(task.end)}//顏色判斷
+                        >
+                            <Task
+                                task={task}
+                                expandedTasks={expandedTasks}
+                                toggleTask={toggleTask}
+                                expandedSubtasks={expandedSubtasks}
+                                toggleSubtask={toggleSubtask}
+                            />
+                        </div>
                     )
                 ))}
                 {isPopupOpen && (
@@ -250,14 +269,16 @@ export default function Maintask({ maintask }) {
                 <button className='bg-gray-400 text-white rounded-md w-1/2' onClick={() => setIsPopup2Open(true)}>Add Task</button>
                 <h1>Dailytask</h1>
                 {dailytasks && dailytasks.map(task => (
-                    task && task.name && (
-                        <Dailytasks
-                            key={task.name}
-                            task={task}
-                            expandedTasks={expandedTasks}
-                            toggleTask={toggleTask}
-                        />
-                    )
+                    <div
+                    key={task.name}
+                    style={getTaskStyle(task.end)}//顏色判斷
+                >
+                    <Dailytasks
+                        task={task}
+                        expandedTasks={expandedTasks}
+                        toggleTask={toggleTask}
+                    />
+                </div>
                 ))}
             </div>
 
@@ -265,12 +286,16 @@ export default function Maintask({ maintask }) {
                 <h1>Subtask</h1>
                 {subtasks && subtasks.map(task => (
                     task && task.name && (
-                        <Subtasks
+                        <div
                             key={task.name}
-                            task={task}
-                            expandedTasks={expandedTasks}
-                            toggleTask={toggleTask}
-                        />
+                            style={getTaskStyle(task.end)}//顏色判斷
+                        >
+                            <Subtasks
+                                task={task}
+                                expandedTasks={expandedTasks}
+                                toggleTask={toggleTask}
+                            />
+                        </div>
                     )
                 ))}
             </div>
