@@ -38,7 +38,7 @@ const Subtask = ({ taskName, subtask, expandedSubtasks, toggleSubtask }) => {
           <p>End: {subtask.end}</p>
           <p>Description: {subtask.description}</p>
 
-          <button onClick={handleChangeState}>delete</button>
+          <button className='bg-gray-400 text-white rounded-md w-1/2'onClick={handleChangeState}>delete</button>
         </div>
         
       )}

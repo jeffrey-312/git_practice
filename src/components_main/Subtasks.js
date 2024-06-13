@@ -38,7 +38,7 @@ const SubTasks = ({ task, expandedTasks, toggleTask}) => {
             <p>belong: {task.belong}</p>
             <p>Description: {task.description}</p>
 
-            <button onClick={handleChangeState}>delete</button>
+            <button className='bg-gray-400 text-white rounded-md'onClick={handleChangeState}>delete</button>
 
         </div>
         )}

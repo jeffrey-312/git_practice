@@ -38,7 +38,7 @@ const Task = ({ task, expandedTasks, toggleTask, expandedSubtasks, toggleSubtask
             <p>End: {task.end}</p>
             <p>Description: {task.description}</p>
 
-            <button onClick={handleChangeState}>delete</button>
+            <button className='bg-gray-400 text-white rounded-md w-1/2' onClick={handleChangeState}>delete</button>
 
             {task.subtasks.length > 0 && (
             <div>

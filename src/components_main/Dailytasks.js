@@ -38,7 +38,7 @@ const DailyTasks = ({ task, expandedTasks, toggleTask}) => {
             <p>End: {task.end}</p>
             <p>Description: {task.description}</p>
 
-            <button onClick={handleChangeState}>delete</button>
+            <button className='bg-gray-400 text-white rounded-md'onClick={handleChangeState}>delete</button>
 
         </div>
         )}

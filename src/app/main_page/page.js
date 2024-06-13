@@ -24,6 +24,20 @@ export default function Maintask({ maintask }) {
     const [userId, setUserId] = useState(null);
     const [username, setUsername] = useState(null);
     const router = useRouter();
+    const [dateTime, setDateTime] = useState('');
+
+    useEffect(() => {
+        const updateDateTime = () => {
+            const date = new Date();
+            const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+            const formattedTime = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+            setDateTime(`${formattedDate} ${formattedTime}`);
+          };
+        updateDateTime();
+        const interval = setInterval(updateDateTime, 60000); // 每分鐘更新一次時間
+
+        return () => clearInterval(interval); // 清除定時器以避免內存洩漏
+      }, []);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -209,21 +223,21 @@ export default function Maintask({ maintask }) {
     return (
         <div className="container bg-slate-200">
             <div className="maintask ">
-                <div className='text-2xl text-gray-600'>User:{username}</div>{/* 要放入username */}
+                <div className='text-2xl text-gray-600'>User : {username}</div>{/* 要放入username */}
                 <div className='gap-2'>
-                    <button className='bg-gray-400 text-white rounded-md w-20' onClick={logOut}>登出</button>
-                    <button className='bg-gray-400 text-white rounded-md w-20' onClick={changePassword}>更改密碼</button>
+                    <button style={{ marginTop: '10px',marginRight: '8px'}}className='bg-gray-400 text-white rounded-md w-20' onClick={logOut} >登出</button>
+                    <button style={{ marginTop: '10px'}}className='bg-gray-400 text-white rounded-md w-20' onClick={changePassword}>更改密碼</button>
                 </div>
-                <div>----------------------</div>
-                <button className='bg-gray-400 text-white rounded-md w-1/2' onClick={() => setIsPopupOpen(true)}>Add Maintask</button>
-                <h1>Maintask</h1>
+                <hr style={{ marginTop: '10px', border: '1px solid #ccc' }} />
+                <button style={{ marginTop: '5px'}} className='bg-gray-400 text-white rounded-md w-1/2' onClick={() => setIsPopupOpen(true)}> + Add Maintask</button>
+                <h1 className= "font-bold"style={{ margin: '5px'}}>Maintask List</h1>
                 {tasks && tasks.map(task => (
                     task && task.name && (
                         <div
                             key={task.name}
                             style={getTaskStyle(task.end)}//顏色判斷
                         >
-                            <Task
+                            <Task 
                                 task={task}
                                 expandedTasks={expandedTasks}
                                 toggleTask={toggleTask}
@@ -249,25 +263,29 @@ export default function Maintask({ maintask }) {
             </div>
 
             <div className="search bg-slate-300 py-5 pl-4">
-                <h1>Search Tasks</h1>
+                <h1  className="font-bold  text-l">Search Tasks</h1>
                 <input
                     type="text"
                     placeholder="Keyword"
                     value={searchKeyword}
                     onChange={(e) => setSearchKeyword(e.target.value)}
+                    className="mr-2"
                 />
                 <input
                     type="date"
                     value={searchDate}
                     onChange={(e) => setSearchDate(e.target.value)}
+                    className="mr-2"
                 />
                 <button className='bg-gray-400 text-white rounded-md w-1/4' onClick={handleSearch}>Search</button>
             </div>
 
             <div className="dailytask">
-                <h1>-------Today's task-------</h1>
-                <button className='bg-gray-400 text-white rounded-md w-1/2' onClick={() => setIsPopup2Open(true)}>Add Task</button>
-                <h1>Dailytask</h1>
+                <h1 className="text-xl">Today</h1>
+                <h2>{dateTime}</h2>
+                <hr style={{ marginTop: '5px', border: '1px solid #ccc' }} />
+                <button style={{ marginTop: '5px'}}className='bg-gray-400 text-white rounded-md w-1/2' onClick={() => setIsPopup2Open(true)}>Add Task</button>
+                <h1 className='font-bold'>Dailytask</h1>
                 {dailytasks && dailytasks.map(task => (
                     <div
                     key={task.name}
@@ -283,7 +301,7 @@ export default function Maintask({ maintask }) {
             </div>
 
             <div className="subtask">
-                <h1>Subtask</h1>
+                <h1 className='font-bold'>Subtask</h1>
                 {subtasks && subtasks.map(task => (
                     task && task.name && (
                         <div
@@ -322,7 +340,7 @@ export default function Maintask({ maintask }) {
                 .maintask {
                     grid-area: maintask;
                     width: 80%;
-                    gap: 16px;
+                    padding: 16px;
                 }
                 .search {
                     grid-area: search;
